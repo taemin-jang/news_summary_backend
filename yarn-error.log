@@ -1,0 +1,36 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\JangTaemin\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js init
+
+PATH: 
+  C:\Program Files\Git\Git\mingw64\bin;C:\Program Files\Git\Git\usr\bin;C:\Users\JangTaemin\bin;C:\Program Files\Eclipse Adoptium\jdk-17.0.3.7-hotspot\bin;C:\Program Files\Eclipse Adoptium\jdk-11.0.14.101-hotspot\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Razer Chroma SDK\bin;C:\Program Files\Razer Chroma SDK\bin;C:\Program Files (x86)\Razer\ChromaBroadcast\bin;C:\Program Files\Razer\ChromaBroadcast\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;C:\Program Files (x86)\IVI Foundation\VISA\WinNT\Bin;C:\Program Files\dotnet;C:\Users\장태민\AppData\Local\Microsoft\WindowsApps;C:\;Users\장태민\.dotnet\tools;%S;stemRoot%\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\WINDOWS\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Java\jdk-11.0.13\bin;D:\PuTTY;C:\Program Files\Bandizip;les\nodejs;les\nodejs;C:\Program Files (x86)\Bitvise SSH Client;C:\Users\JangTaemin\AppData\Roaming\npm\node_modules\@vue\cli\bin;C:\Users\JangTaemin\AppData\Roaming\npm\vue;C:\Users\JangTaemin\AppData\Roaming;C:\Users\JangTaemin\AppData\Roaming\npm;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\nodejs;C:\Program Files\Git\Git\cmd;D:\3학년 1학기\홈네트워크\2주차\3차시\Git\Git\cmd;C:\Users\JangTaemin\AppData\Local\Programs\Python\Python310\Scripts;C:\Users\JangTaemin\AppData\Local\Programs\Python\Python310;C:\Program Files\MySQL\MySQL Shell 8.0\bin;C:\Python39\Scripts;C:\Python39;C:\Users\장태민\AppData\Local\Microsoft\WindowsApps;C:\Users\장태민\AppData\Local\atom\bin;C:\Users\JangTaemin\AppData\Local\Microsoft\WindowsApps;C:\Users\장태민\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\장태민\AppData\Roaming\npm;C:\Program Files\nodejs;C:\Users\JangTaemin\AppData\Roaming\npm\node_modules\@vue\cli\bin;C:\Users\JangTaemin\AppData\Roaming\npm\vue;C:\Users\JangTaemin\AppData\Roaming;C:\Program Files (x86)\Nmap;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Users\JangTaemin\AppData\Roaming\npm
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  18.14.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (C:\Users\JangTaemin\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:137150:13)
+      at Interface.emit (node:events:513:28)
+      at [_ttyWrite] [as _ttyWrite] (node:internal/readline/interface:1130:18)
+      at ReadStream.onkeypress (node:internal/readline/interface:270:20)
+      at ReadStream.emit (node:events:513:28)
+      at emitKeys (node:internal/readline/utils:357:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (node:internal/readline/emitKeypressEvents:64:36)
+      at ReadStream.emit (node:events:513:28)
+      at addChunk (node:internal/streams/readable:324:12)
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

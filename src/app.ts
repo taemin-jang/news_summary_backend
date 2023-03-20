@@ -6,6 +6,10 @@ const app: Application = express();
 const port = config.port;
 
 app.get("/", async (req: Request, res: Response) => {
+  res.send("hello");
+});
+
+app.get("/naver", async (req: Request, res: Response) => {
   try {
     const headers = {
       "X-Naver-Client-Id": config.naver_client_id,

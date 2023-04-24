@@ -1,8 +1,8 @@
 import { Sequelize } from "sequelize";
 import { Container } from "typedi";
 import LoggerInstance from "./logger";
-import sequelizeInstance from "./sequelize";
 
+// typedi의 Container에 등록
 export default async (sequelizeInstance: Sequelize) => {
   // logger 의존성 설정
   Container.set("logger", LoggerInstance);

@@ -3,9 +3,16 @@ import express, { Application } from "express";
 import config from "@config";
 import Container from "typedi";
 import { Logger } from "winston";
+import cors from "cors";
 
 async function startServer() {
   const app: Application = express();
+
+  const corsOptions = {
+    origin: "http://localhost:5173",
+  };
+  // CORS 미들웨어 사용
+  app.use(cors(corsOptions));
 
   // loaders로 로직 분리
   await loaders(app);

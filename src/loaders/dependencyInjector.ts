@@ -1,6 +1,8 @@
 import { Sequelize } from "sequelize";
 import { Container } from "typedi";
 import LoggerInstance from "./logger";
+import models from "@models/index";
+import Kakao from "@models/Kakao";
 
 // typedi의 Container에 등록
 export default async (sequelizeInstance: Sequelize) => {
@@ -9,4 +11,9 @@ export default async (sequelizeInstance: Sequelize) => {
 
   // db 의존성 설정
   Container.set("db", sequelizeInstance);
+
+  // 테이블 생성
+  models(sequelizeInstance);
+
+  Container.set("kakaoModel", Kakao(sequelizeInstance));
 };

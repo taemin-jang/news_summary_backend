@@ -18,4 +18,13 @@ export default {
   logs: {
     level: process.env.NODE_ENV === "development" ? "debug" : "warn",
   },
+
+  host: process.env.HOST as string,
+  mysql_port: process.env.MYSQL_PORT,
+  user: process.env.USER as string,
+  password: process.env.PASSWORD as string,
+  database: process.env.DATABASE as string,
+
+  session_key: process.env.SESSION_KEY as string,
+  session_secret: process.env.SESSION_SECRET as string,
 };

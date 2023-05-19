@@ -1,12 +1,11 @@
-import { Router, Application } from "express";
-import { SessionModule } from "../types/SessionModule";
+import { Router } from "express";
 import naverSearch from "./routes/naverSearch";
 import chatGPT from "./routes/chatGPT";
 import kakao from "./routes/kakao";
 
-export default (session: SessionModule) => {
+export default () => {
   const router = Router();
-  kakao(router, session);
+  kakao(router);
   naverSearch(router);
   chatGPT(router);
   return router;

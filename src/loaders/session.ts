@@ -1,6 +1,4 @@
 import config from "@config";
-import { Application } from "express";
-import { SessionModule } from "../types/SessionModule";
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
 const sessionStore = new MySQLStore({
@@ -11,15 +9,13 @@ const sessionStore = new MySQLStore({
   database: config.database,
 });
 
-export const sessionModule = (app: Application): SessionModule => {
-  app.use(
-    session({
-      key: config.session_key,
-      secret: config.session_secret,
-      store: sessionStore,
-      resave: false,
-      saveUninitialized: false,
-    })
-  );
-  return app;
-};
+export default session({
+  key: config.session_key,
+  secret: config.session_secret,
+  store: sessionStore,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 3600000,
+  },
+});

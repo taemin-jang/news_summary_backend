@@ -2,8 +2,8 @@ import express, { Request, Response, NextFunction, Router } from "express";
 import morgan from "morgan";
 import routes from "@api";
 import history from "connect-history-api-fallback";
-import { sessionModule } from "./session";
-import { SessionModule } from "../types/SessionModule";
+import session from "./session";
+import cookieParser from "cookie-parser";
 
 export default (app: express.Application) => {
   app.use(morgan("dev"));
@@ -13,10 +13,13 @@ export default (app: express.Application) => {
   app.use(express.json());
   // 클라이언트가 URL 인코딩된 데이터를 전송할 경우
   app.use(express.urlencoded({ extended: true }));
+  app.use(express.static(__dirname + "/../public"));
+  // cookie middlewares
+  app.use(cookieParser());
   // session middleware
-  const session: SessionModule = sessionModule(app);
+  app.use(session);
   // /api 경로로 들어오면 api 폴더에 맞게 라우팅
-  app.use("/api", routes(session));
+  app.use("/api", routes());
   app.use(history());
 
   app.use((req, res, next) => {

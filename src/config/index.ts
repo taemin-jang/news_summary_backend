@@ -27,4 +27,7 @@ export default {
 
   session_key: process.env.SESSION_KEY as string,
   session_secret: process.env.SESSION_SECRET as string,
+
+  stock_service_key: process.env.STOCK_SERVICE_KEY as string,
+  stock_base_url: process.env.STOCK_BASE_URL as string,
 };

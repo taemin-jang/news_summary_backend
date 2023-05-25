@@ -14,9 +14,19 @@ export default (app: Router) => {
         const response = await StockInstance.getStock(
           req.query.search.toString()
         );
-        // console.log(response.data.response.body.items);
+        console.log(req.query.search.toString());
+        console.log(response.data.response.body.items);
         res.json(response.data.response.body.items);
       }
+    } catch (err) {
+      logger.error(err);
+    }
+  });
+
+  app.get("/stock/list", async (req: Request, res: Response) => {
+    try {
+      const response = await StockInstance.getAllStock();
+      res.send(response);
     } catch (err) {
       logger.error(err);
     }

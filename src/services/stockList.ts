@@ -19,6 +19,12 @@ export default class StockService {
     const stockItem: AxiosResponse = await axios.get(
       `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&basDt=20230523&itmsNm=${keyword}&numOfRows=10&resultType=json`
     );
+    console.log("keyword", keyword);
+    return stockItem;
+  }
+
+  // 모든 stock 정보 반환
+  public async getAllStock() {
     let stock = await this.stockModel.findAll();
 
     // 만약 주식 리스트가 하나도 없다면 리스트 저장
@@ -26,9 +32,10 @@ export default class StockService {
       const response: AxiosResponse = await axios.get(
         `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&basDt=20230523&numOfRows=2716&resultType=json`
       );
-      this.registStock(response.data.response.body.items.item);
+      await this.registStock(response.data.response.body.items.item);
+      stock = await this.stockModel.findAll();
     }
-    return stockItem;
+    return stock;
   }
 
   // 데이터베이스에 stock 등록

@@ -1,10 +1,10 @@
 import axios, { AxiosResponse } from "axios";
 import Container from "typedi";
-import { Logger, loggers } from "winston";
+import { Logger } from "winston";
 import { ModelCtor, Sequelize } from "sequelize";
 import config from "@config";
 import moment, { Moment } from "moment";
-import { StockResponse } from "../types/StockResponse";
+import { StockResponse, StockModel } from "../types/StockResponse";
 
 export default class StockService {
   stockModel: ModelCtor<any>;
@@ -13,13 +13,13 @@ export default class StockService {
   constructor() {
     const db: Sequelize = Container.get("db");
     this.stockModel = db.models.Stock;
-    this.currentDate = moment().add(-1, "days");
+    this.currentDate = moment().add(-2, "days");
     this.stockLatestDay = this.currentDate.format("YYYYMMDD");
     this.getNextWeekay();
   }
 
   /**
-   * 주말과, 공휴일, 금일을 제외한 최근 평일 구하는 함수
+   * 주말과, 공휴일, 금일을 제외한 주식 마지막 마감장 구하는 함수
    */
   public async getNextWeekay() {
     // 공휴일 정보 데이터
@@ -43,17 +43,24 @@ export default class StockService {
     this.stockLatestDay = this.currentDate.format("YYYYMMDD");
   }
 
-  // 키워드로 주식 정보 반환
-  public async getStock(keyword: string) {
+  /**
+   * 키워드로 주식 정보 반환하는 함수
+   * @param keyword string, 검색할 주식 명
+   * @returns stockItem 주식 정보
+   */
+  public async getStock(keyword: string): Promise<AxiosResponse> {
     const stockItem: AxiosResponse = await axios.get(
       `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&basDt=${this.stockLatestDay}&itmsNm=${keyword}&numOfRows=10&resultType=json`
     );
     return stockItem;
   }
 
-  // 모든 stock 정보 반환
-  public async getAllStock() {
-    let stock = await this.stockModel.findAll();
+  /**
+   * 상장된 주식 리스트를 반환하는 함수
+   * @returns stock 주식 리스트
+   */
+  public async getAllStock(): Promise<StockModel[]> {
+    let stock: StockModel[] = await this.stockModel.findAll();
 
     // 만약 주식 리스트가 하나도 없다면 리스트 저장
     if (!stock.length) {
@@ -66,7 +73,10 @@ export default class StockService {
     return stock;
   }
 
-  // 데이터베이스에 stock 등록
+  /**
+   * stocks 테이블에 주식 등록하는 함수
+   * @param stockArr api로 받아온 주식 정보
+   */
   public registStock(stockArr: Array<StockResponse>) {
     try {
       stockArr.forEach(async (v) => {

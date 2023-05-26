@@ -15,3 +15,9 @@ export interface StockResponse {
   trqu: string;
   vs: string;
 }
+
+export interface StockModel {
+  itmsNm: string;
+  srtnCd: string;
+  mrktCtg: string;
+}

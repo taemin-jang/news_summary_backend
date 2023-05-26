@@ -1,9 +1,11 @@
 import Kakao from "@models/Kakao";
 import Stock from "@models/Stock";
+import Portfolio from "@models/Portfolio";
 import { Sequelize } from "sequelize";
 
 export default async (db: Sequelize) => {
-  const kakaoModel = Kakao(db);
-  const StockModel = Stock(db);
+  const KakaoModel = await Kakao(db);
+  const StockModel = await Stock(db);
+  const PortfolioModel = await Portfolio(db, KakaoModel, StockModel);
   await db.sync();
 };

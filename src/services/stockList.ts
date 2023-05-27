@@ -5,14 +5,17 @@ import { ModelCtor, Sequelize } from "sequelize";
 import config from "@config";
 import moment, { Moment } from "moment";
 import { StockResponse, StockModel } from "../types/StockResponse";
+import { PortfolioModel } from "../types/PortfolioResponse";
 
 export default class StockService {
   stockModel: ModelCtor<any>;
+  portfolioModel;
   currentDate: Moment;
   stockLatestDay: string;
   constructor() {
     const db: Sequelize = Container.get("db");
     this.stockModel = db.models.Stock;
+    this.portfolioModel = db.models;
     this.currentDate = moment().add(-2, "days");
     this.stockLatestDay = this.currentDate.format("YYYYMMDD");
     this.getNextWeekay();
@@ -48,10 +51,16 @@ export default class StockService {
    * @param keyword string, 검색할 주식 명
    * @returns stockItem 주식 정보
    */
-  public async getStock(keyword: string): Promise<AxiosResponse> {
+  public async getStock(
+    keyword: string,
+    userId: number
+  ): Promise<AxiosResponse> {
     const stockItem: AxiosResponse = await axios.get(
       `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&basDt=${this.stockLatestDay}&itmsNm=${keyword}&numOfRows=10&resultType=json`
     );
+    await this.portfolioModel.Portfolio.findOrCreate({
+      where: { stock_id: keyword, kakao_id: userId },
+    });
     return stockItem;
   }
 
@@ -90,5 +99,38 @@ export default class StockService {
       const logger: Logger = Container.get("logger");
       logger.error(err);
     }
+  }
+
+  /**
+   * kakao_id 값으로 등록된 portfolio 주식 리스트 반환하는 함수
+   * @param userId number, kakao_id
+   * @returns portfolio
+   */
+  public async getPortfolio(userId: number): Promise<PortfolioModel[]> {
+    const portfolio: PortfolioModel[] =
+      await this.portfolioModel.Portfolio.findAll({
+        where: {
+          kakao_id: userId,
+        },
+      });
+    return portfolio;
+  }
+
+  /**
+   * 포트폴리오 데이터 테이블에 등록된 주식에 대한 정보를 반환하는 함수
+   * @param portfolio
+   * @returns
+   */
+  public async getRegistedStockInfo(
+    portfolio: PortfolioModel[]
+  ): Promise<PortfolioModel[]> {
+    let stockInfo: PortfolioModel[] = [];
+    for (let v of portfolio) {
+      const responose = await axios.get(
+        `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&basDt=20230525&itmsNm=${v.stock_id}&numOfRows=10&resultType=json`
+      );
+      stockInfo[v.id - 1] = responose.data.response.body.items.item[0];
+    }
+    return stockInfo;
   }
 }

@@ -1,10 +1,10 @@
 import { Sequelize, DataTypes, ModelCtor } from "sequelize";
+import Kakao from "@models/Kakao";
+import Stock from "@models/Stock";
 
-export default async (
-  db: Sequelize,
-  KakaoModel: ModelCtor<any>,
-  StockModel: ModelCtor<any>
-) => {
+export default async (db: Sequelize) => {
+  const KakaoModel = await Kakao(db);
+  const StockModel = await Stock(db);
   // portfolio 모델
   const portfolioModel = db.define(
     "Portfolio",

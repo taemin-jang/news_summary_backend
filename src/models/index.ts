@@ -6,6 +6,6 @@ import { Sequelize } from "sequelize";
 export default async (db: Sequelize) => {
   const KakaoModel = await Kakao(db);
   const StockModel = await Stock(db);
-  const PortfolioModel = await Portfolio(db, KakaoModel, StockModel);
+  const PortfolioModel = await Portfolio(db);
   await db.sync();
 };

@@ -56,7 +56,7 @@ export default class StockService {
     userId: number
   ): Promise<AxiosResponse> {
     const stockItem: AxiosResponse = await axios.get(
-      `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&basDt=${this.stockLatestDay}&itmsNm=${keyword}&numOfRows=10&resultType=json`
+      `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&basDt=20230525&itmsNm=${keyword}&numOfRows=10&resultType=json`
     );
     await this.portfolioModel.Portfolio.findOrCreate({
       where: { stock_id: keyword, kakao_id: userId },
@@ -132,5 +132,16 @@ export default class StockService {
       stockInfo[v.id - 1] = responose.data.response.body.items.item[0];
     }
     return stockInfo;
+  }
+
+  /**
+   * 포트폴리오에 등록된 주식 삭제하는 함수
+   * @param keyword 삭제할 주식명
+   * @param userId 삭제하는 사용자
+   */
+  public async deleteStock(keyword: string, userId: number) {
+    await this.portfolioModel.Portfolio.destroy({
+      where: { kakao_id: userId, stock_id: keyword },
+    });
   }
 }

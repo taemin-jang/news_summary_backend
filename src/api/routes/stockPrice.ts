@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, response } from "express";
 import Container from "typedi";
 import { Logger } from "winston";
 import StockService from "@services/stockList";
@@ -40,6 +40,20 @@ export default (app: Router) => {
     try {
       const response = await StockInstance.getRegistedStockInfo(req.body);
       res.send(response);
+    } catch (err) {
+      logger.error(err);
+    }
+  });
+
+  app.delete("/stock", async (req: Request, res: Response) => {
+    try {
+      if (req.query.delete !== undefined) {
+        await StockInstance.deleteStock(
+          req.query.delete.toString(),
+          (req.session as any)?.user.id
+        );
+      }
+      res.status(200);
     } catch (err) {
       logger.error(err);
     }

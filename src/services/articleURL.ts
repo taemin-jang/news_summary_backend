@@ -1,3 +1,4 @@
+import { getContent } from "@services/articleContent";
 import { getImage } from "@services/imageFromArticle";
 /**
  * 네이버 기사 정보에 image를 추가해서 반환하는 함수
@@ -23,6 +24,9 @@ export const getArticle = async (articleArray, id) => {
       const image = getImage(htmlText);
       // 이미지를 뉴스 기사에 추가
       articleArray[id].images = image;
+      const content = getContent(htmlText);
+      // 기사 내용 추가
+      articleArray[id].content = content;
     } else {
       // 네이버 뉴스 기사가 아닌경우 images에 null 추가
       articleArray[id].images = null;

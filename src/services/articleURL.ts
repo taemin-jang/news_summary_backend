@@ -1,6 +1,7 @@
 import { getContent } from "@services/articleContent";
 import { getImage } from "@services/imageFromArticle";
 import { getContentSummary } from "@services/contentSummary";
+import { getGptKeyword } from "@services/gptKeyword";
 /**
  * 네이버 기사 정보에 image를 추가해서 반환하는 함수
  * @param articleArray 네이버 search api로 받아온 뉴스 기사
@@ -34,10 +35,16 @@ export const getArticle = async (articleArray, id) => {
           content,
           articleArray[id].title
         );
-        // 기사 요약 본 추가
-        if (contentSummary.summary)
+        if (contentSummary.summary) {
+          // 기사 요약본 추가
           articleArray[id].summary = contentSummary.summary;
-        else articleArray[id].summary = contentSummary.error;
+          // 기사 핵심 키워드 추가
+          const keywordRes = await getGptKeyword(contentSummary.summary);
+          const keywords = keywordRes
+            ?.split("\n")
+            .map((keyword) => keyword.split(". ")[1]);
+          articleArray[id].keywords = keywords;
+        } else articleArray[id].summary = contentSummary.error;
       }
     } else {
       // 네이버 뉴스 기사가 아닌경우 images에 null 추가

@@ -1,5 +1,6 @@
 import { getContent } from "@services/articleContent";
 import { getImage } from "@services/imageFromArticle";
+import { getContentSummary } from "@services/contentSummary";
 /**
  * 네이버 기사 정보에 image를 추가해서 반환하는 함수
  * @param articleArray 네이버 search api로 받아온 뉴스 기사
@@ -27,6 +28,17 @@ export const getArticle = async (articleArray, id) => {
       const content = getContent(htmlText);
       // 기사 내용 추가
       articleArray[id].content = content;
+
+      if (content !== null) {
+        const contentSummary = await getContentSummary(
+          content,
+          articleArray[id].title
+        );
+        // 기사 요약 본 추가
+        if (contentSummary.summary)
+          articleArray[id].summary = contentSummary.summary;
+        else articleArray[id].summary = contentSummary.error;
+      }
     } else {
       // 네이버 뉴스 기사가 아닌경우 images에 null 추가
       articleArray[id].images = null;

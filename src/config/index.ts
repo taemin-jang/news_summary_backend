@@ -13,6 +13,10 @@ export default {
   naver_client_secret: process.env.NAVER_CLIENT_SECRET as string,
   naver_host: process.env.NAVER_HOST as string,
 
+  naver_clova_summary_key_id: process.env.X_NCP_APIGW_API_KEY_ID as string,
+  naver_clova_summary_key: process.env.X_NCP_APIGW_API_KEY as string,
+  naver_clova_summary_base_url: process.env.X_NCP_APIGW_API_BASE_URL as string,
+
   openai_api_key: process.env.OPENAI_API_KEY as string,
 
   logs: {

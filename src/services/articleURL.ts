@@ -2,17 +2,25 @@ import { getContent } from "@services/articleContent";
 import { getImage } from "@services/imageFromArticle";
 import { getContentSummary } from "@services/contentSummary";
 import { getGptKeyword } from "@services/gptKeyword";
+import ArticleService from "@services/articleServices";
+import { NaverNewsResponse } from "../types/NaverNewsResponse";
+
 /**
  * 네이버 기사 정보에 image를 추가해서 반환하는 함수
  * @param articleArray 네이버 search api로 받아온 뉴스 기사
  * @param id 해당 기사의 인덱스
  * @returns articleArray
  */
-export const getArticle = async (articleArray, id) => {
+export const getArticle = async (
+  articleArray: NaverNewsResponse[],
+  id: number,
+  keyword: string
+) => {
+  const ArticleInstance = new ArticleService();
   // news.naver가 포함된 주소만 찾는 정규식
   const regex = /news\.naver/;
   // 기사 URL
-  let articleURL = "";
+  let articleURL: string = "";
 
   if (id < articleArray.length) {
     // news.naver일 경우
@@ -44,13 +52,16 @@ export const getArticle = async (articleArray, id) => {
             ?.split("\n")
             .map((keyword) => keyword.split(". ")[1]);
           articleArray[id].keywords = keywords;
+
+          // 기사에 추가한 내용 db 등록
+          await ArticleInstance.registArticle(articleArray[id], keyword);
         } else articleArray[id].summary = contentSummary.error;
       }
     } else {
       // 네이버 뉴스 기사가 아닌경우 images에 null 추가
       articleArray[id].images = null;
     }
-    await getArticle(articleArray, id + 1);
+    await getArticle(articleArray, id + 1, keyword);
   }
   return articleArray;
 };

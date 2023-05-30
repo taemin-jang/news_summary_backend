@@ -4,6 +4,7 @@ import { Logger } from "winston";
 import config from "@config";
 import axios, { AxiosResponse } from "axios";
 import { getArticle } from "@services/articleURL";
+import { NaverNewsResponse } from "../../types/NaverNewsResponse";
 
 export default (app: Router) => {
   const logger: Logger = Container.get("logger");
@@ -23,13 +24,13 @@ export default (app: Router) => {
       };
       // naver search api 호출
       const aixosResponse: AxiosResponse = await axios.get(
-        `https://openapi.naver.com/v1/search/news.json?query=${req.params.keyword}&display=20`,
+        `https://openapi.naver.com/v1/search/news.json?query=${req.params.keyword}&display=10`,
         { headers }
       );
       // 네이버 뉴스 기사 저장
-      let articles = "";
+      let articles: NaverNewsResponse[] = [];
       // 뉴스 기사에 이미지를 추가하고 네이버 뉴스 기사만 articles에 저장
-      await getArticle(aixosResponse.data.items, 0).then(
+      await getArticle(aixosResponse.data.items, 0, req.params.keyword).then(
         (result) =>
           (articles = result.filter((article) => article.images !== null))
       );

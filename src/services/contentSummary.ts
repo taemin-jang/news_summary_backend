@@ -1,7 +1,11 @@
 import axios from "axios";
 import config from "@config";
+import { ClovaSummary } from "../types/NaverNewsResponse";
 
-export const getContentSummary = async (content: string, title: string) => {
+export const getContentSummary = async (
+  content: string,
+  title: string
+): Promise<ClovaSummary> => {
   title = title
     .replace(/&apos;/g, "'")
     .replace(/&quot;/g, '"')
@@ -28,7 +32,7 @@ export const getContentSummary = async (content: string, title: string) => {
     "Content-Type": "application/json",
   };
 
-  const response = await axios
+  const response: ClovaSummary = await axios
     .post(config.naver_clova_summary_base_url, data, { headers })
     .then((result) => result.data)
     .catch((err) => err.response.data);

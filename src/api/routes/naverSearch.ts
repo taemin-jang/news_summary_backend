@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import Container from "typedi";
 import { Logger } from "winston";
 import { getArticle } from "@services/articleURL";
-import { NaverNewsResponse } from "../../types/NaverNewsResponse";
+import { PortfolioJoinArticle } from "../../types/NaverNewsResponse";
 import ArticleService from "@services/articleServices";
 
 export default (app: Router) => {
@@ -16,7 +16,7 @@ export default (app: Router) => {
     try {
       const ArticleInstance = new ArticleService();
       // 네이버 뉴스 기사 저장
-      let articles: NaverNewsResponse[] = [];
+      let articles: PortfolioJoinArticle[] = [];
       await ArticleInstance.getUserArticle((req.session as any)?.user.id).then(
         (result) => {
           articles = Array.from(result);

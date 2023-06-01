@@ -24,20 +24,15 @@ export const getArticle = async (userid: number) => {
     const ArticleInstance = new ArticleService();
     const StockInstance = new StockService();
     const portfolios = await StockInstance.getPortfolio(userid);
-    let articles;
+
     for (let portfolio of portfolios) {
-      console.log(portfolio.stock_id);
       // naver search api 호출
       const aixosResponse: AxiosResponse = await axios.get(
         `https://openapi.naver.com/v1/search/news.json?query=${portfolio.stock_id}&display=10`,
         { headers }
       );
       const articleArray: NaverNewsResponse[] = aixosResponse.data.items;
-      articles = await ArticleInstance.addArticleInfo(
-        articleArray,
-        0,
-        portfolio.stock_id
-      );
+      await ArticleInstance.addArticleInfo(articleArray, 0, portfolio.stock_id);
     }
   } catch (err) {
     logger.error(err);

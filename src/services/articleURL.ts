@@ -1,4 +1,6 @@
 import config from "@config";
+import Container from "typedi";
+import { Logger } from "winston";
 import axios, { AxiosResponse } from "axios";
 import ArticleService from "@services/articleServices";
 import StockService from "@services/stockList";
@@ -17,23 +19,27 @@ const headers = {
  * @param userid 사용자
  */
 export const getArticle = async (userid: number) => {
-  const ArticleInstance = new ArticleService();
-  const StockInstance = new StockService();
-  const portfolios = await StockInstance.getPortfolio(userid);
-  let articles;
-  for (let portfolio of portfolios) {
-    console.log(portfolio.stock_id);
-    // naver search api 호출
-    const aixosResponse: AxiosResponse = await axios.get(
-      `https://openapi.naver.com/v1/search/news.json?query=${portfolio.stock_id}&display=5`,
-      { headers }
-    );
-    const articleArray: NaverNewsResponse[] = aixosResponse.data.items;
-    articles = await ArticleInstance.addArticleInfo(
-      articleArray,
-      0,
-      portfolio.stock_id
-    );
-    console.log(articles);
+  const logger: Logger = Container.get("logger");
+  try {
+    const ArticleInstance = new ArticleService();
+    const StockInstance = new StockService();
+    const portfolios = await StockInstance.getPortfolio(userid);
+    let articles;
+    for (let portfolio of portfolios) {
+      console.log(portfolio.stock_id);
+      // naver search api 호출
+      const aixosResponse: AxiosResponse = await axios.get(
+        `https://openapi.naver.com/v1/search/news.json?query=${portfolio.stock_id}&display=10`,
+        { headers }
+      );
+      const articleArray: NaverNewsResponse[] = aixosResponse.data.items;
+      articles = await ArticleInstance.addArticleInfo(
+        articleArray,
+        0,
+        portfolio.stock_id
+      );
+    }
+  } catch (err) {
+    logger.error(err);
   }
 };

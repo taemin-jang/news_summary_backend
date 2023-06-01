@@ -23,12 +23,11 @@ export default (app: Router) => {
         }
       );
 
-      // 주식 포트폴리오 등록한 주식 기사 데이터베이스 저장
-      // await getArticle((req.session as any)?.user.id, req.params.keyword).then(
-      //   (result) =>
-      //     (articles = result.filter((article) => article.images !== null))
-      // );
-      console.log(articles);
+      // db에 기사기 없을 경우
+      if (!articles.length) {
+        // 주식 포트폴리오 등록한 주식 기사 데이터베이스 저장
+        await getArticle((req.session as any)?.user.id);
+      }
       res.status(200).send(articles);
     } catch (err) {
       logger.error(err);

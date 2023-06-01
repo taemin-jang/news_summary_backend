@@ -6,14 +6,17 @@ import { getContent } from "@services/articleContent";
 import { getImage } from "@services/imageFromArticle";
 import { getContentSummary } from "@services/contentSummary";
 import { getGptKeyword } from "@services/gptKeyword";
+import { PortfolioJoinArticle, ClovaSummary } from "../types/NaverNewsResponse";
 
 export default class ArticleService {
-  articleModle: ModelCtor<any>;
+  articleModel: ModelCtor<any>;
   portfolioModel: ModelCtor<any>;
+  stockModel: ModelCtor<any>;
   constructor() {
     const db: Sequelize = Container.get("db");
-    this.articleModle = db.models.Article;
+    this.articleModel = db.models.Article;
     this.portfolioModel = db.models.Portfolio;
+    this.stockModel = db.models.Stock;
   }
 
   /**
@@ -23,7 +26,7 @@ export default class ArticleService {
    */
   public async registArticle(article: NaverNewsResponse, stock_id: string) {
     try {
-      await this.articleModle.create({
+      await this.articleModel.create({
         title: article.title,
         content: article.content,
         link: article.link,
@@ -39,6 +42,12 @@ export default class ArticleService {
     }
   }
 
+  /**
+   * 뉴스 기사에 항목(이미지, 요약, 키워드 등)을 추가하는 함수
+   * @param articleArray 뉴스 기사 리스트
+   * @param id 인덱스
+   * @param keyword 주식 명
+   */
   public async addArticleInfo(
     articleArray: NaverNewsResponse[],
     id: number,
@@ -67,10 +76,10 @@ export default class ArticleService {
           articleArray[id].content = content;
 
           if (content !== null) {
-            const contentSummary = await getContentSummary(
+            let contentSummary: ClovaSummary = await getContentSummary(
               content,
               articleArray[id].title
-            );
+            ).then((result) => result);
             if (contentSummary.summary) {
               // 기사 요약본 추가
               articleArray[id].summary = contentSummary.summary;
@@ -92,28 +101,26 @@ export default class ArticleService {
       }
       await this.addArticleInfo(articleArray, id + 1, keyword);
     }
-
-    return articleArray;
   }
 
-  public async getUserArticle(user_id) {
-    const myPortfolio = await this.portfolioModel.findAll({
-      where: {
-        kakao_id: user_id,
-      },
-    });
-    let arr: any = new Map();
-    for (let i in myPortfolio) {
-      arr.set(
-        myPortfolio[i].stock_id,
-        await this.articleModle.findAll({
-          where: {
-            stock_id: myPortfolio[i].stock_id,
-          },
-          limit: 5,
-        })
-      );
-    }
-    return arr;
+  /**
+   * 각 사용자가 등록한 포트폴리오의 뉴스 기사 반환하는 함수
+   * @param user_id number
+   * @returns
+   */
+  public async getUserArticle(
+    user_id: string
+  ): Promise<PortfolioJoinArticle[]> {
+    const myPortfolio: PortfolioJoinArticle[] =
+      await this.portfolioModel.findAll({
+        where: {
+          kakao_id: user_id,
+        },
+        include: {
+          model: this.articleModel,
+          as: "article",
+        },
+      });
+    return myPortfolio;
   }
 }

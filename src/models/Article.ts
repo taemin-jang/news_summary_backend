@@ -1,9 +1,6 @@
 import { Sequelize, DataTypes } from "sequelize";
-import Stock from "@models/Stock";
 
 export default async (db: Sequelize) => {
-  const StockModel = await Stock(db);
-
   const articleModel = db.define(
     "Article",
     {
@@ -55,16 +52,6 @@ export default async (db: Sequelize) => {
     },
     { timestamps: false }
   );
-
-  // 뉴스 기사 : 주식(회사) = 1 : N 관계
-  // 뉴스 기사는 하나의 주식(회사)에 속함
-  articleModel.belongsTo(StockModel, {
-    foreignKey: "stock_id",
-  });
-  // 주식(회사)는 여러 개의 뉴스 기사를 가질 수 있음
-  StockModel.hasMany(articleModel, {
-    foreignKey: "stock_id",
-  });
 
   return articleModel;
 };

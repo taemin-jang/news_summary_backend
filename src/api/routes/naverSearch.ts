@@ -12,16 +12,17 @@ export default (app: Router) => {
    * naver search api로 뉴스 기사를 받음
    * 각 기사에 이미지들을 추가하고 네이버 뉴스만 가져와 반환
    */
-  app.get("/naver/:keyword", async (req: Request, res: Response) => {
+  app.get("/naver", async (req: Request, res: Response) => {
     try {
       const ArticleInstance = new ArticleService();
       // 네이버 뉴스 기사 저장
       let articles: PortfolioJoinArticle[] = [];
-      await ArticleInstance.getUserArticle((req.session as any)?.user.id).then(
-        (result) => {
-          articles = Array.from(result);
-        }
-      );
+      await ArticleInstance.getUserArticle(
+        (req.session as any)?.user.id,
+        Number(req.query.page)
+      ).then((result) => {
+        articles = Array.from(result);
+      });
 
       // db에 기사기 없을 경우
       if (!articles.length) {

@@ -12,11 +12,15 @@ export default class ArticleService {
   articleModel: ModelCtor<any>;
   portfolioModel: ModelCtor<any>;
   stockModel: ModelCtor<any>;
+  test;
   constructor() {
     const db: Sequelize = Container.get("db");
     this.articleModel = db.models.Article;
     this.portfolioModel = db.models.Portfolio;
     this.stockModel = db.models.Stock;
+    this.test = Sequelize.literal(
+      "ROW_NUMBER() OVER (PARTITION BY portfolios.id ORDER BY articles.id DESC)"
+    );
   }
 
   /**
@@ -102,24 +106,29 @@ export default class ArticleService {
       await this.addArticleInfo(articleArray, id + 1, keyword);
     }
   }
-
   /**
    * 각 사용자가 등록한 포트폴리오의 뉴스 기사 반환하는 함수
    * @param user_id number
    * @returns
    */
   public async getUserArticle(
-    user_id: string
+    user_id: string,
+    page: number
   ): Promise<PortfolioJoinArticle[]> {
     const myPortfolio: PortfolioJoinArticle[] =
       await this.portfolioModel.findAll({
         where: {
           kakao_id: user_id,
         },
-        include: {
-          model: this.articleModel,
-          as: "article",
-        },
+        include: [
+          {
+            model: this.articleModel,
+            as: "article",
+            order: [["id", "DESC"]],
+            offset: page * 2,
+            limit: 2,
+          },
+        ],
       });
     return myPortfolio;
   }

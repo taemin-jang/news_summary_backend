@@ -28,7 +28,7 @@ export const getArticle = async (userid: number) => {
     for (let portfolio of portfolios) {
       // naver search api 호출
       const aixosResponse: AxiosResponse = await axios.get(
-        `https://openapi.naver.com/v1/search/news.json?query=${portfolio.stock_id}&display=10`,
+        `https://openapi.naver.com/v1/search/news.json?query=${portfolio.stock_id}&display=20`,
         { headers }
       );
       const articleArray: NaverNewsResponse[] = aixosResponse.data.items;

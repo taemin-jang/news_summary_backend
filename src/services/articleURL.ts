@@ -15,10 +15,10 @@ const headers = {
 };
 
 /**
- * 포트폴리오에 등록된 각각의 주식을 article 테이블에 저장
+ * 포트폴리오에 등록된 모든 주식의 뉴스 기사를 article 테이블에 저장
  * @param userid 사용자
  */
-export const getArticle = async (userid: number) => {
+export const registAllPortfolioToArticle = async (userid: number) => {
   const logger: Logger = Container.get("logger");
   try {
     const ArticleInstance = new ArticleService();

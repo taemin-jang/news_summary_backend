@@ -34,4 +34,19 @@ export default (app: Router) => {
       logger.error(err);
     }
   });
+
+  app.get("/naver/article", async (req: Request, res: Response) => {
+    try {
+      if (req.query.search) {
+        const ArticleInstance = new ArticleService();
+        const response = await ArticleInstance.getSearchArticle(
+          (req.session as any)?.user.id,
+          req.query.search.toString()
+        );
+        res.send(response);
+      }
+    } catch (err) {
+      logger.error(err);
+    }
+  });
 };

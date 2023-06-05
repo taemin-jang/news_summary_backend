@@ -132,4 +132,24 @@ export default class ArticleService {
       });
     return myPortfolio;
   }
+
+  public async getSearchArticle(
+    user_id: string,
+    keyword: string
+  ): Promise<PortfolioJoinArticle[]> {
+    const response: PortfolioJoinArticle[] = await this.portfolioModel.findAll({
+      include: [
+        {
+          model: this.articleModel,
+          as: "article",
+          order: [["id", "DESC"]],
+        },
+      ],
+      where: {
+        kakao_id: user_id,
+        stock_id: keyword,
+      },
+    });
+    return response;
+  }
 }

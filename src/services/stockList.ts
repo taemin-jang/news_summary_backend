@@ -6,6 +6,7 @@ import config from "@config";
 import moment, { Moment } from "moment";
 import { StockResponse, StockModel } from "../types/StockResponse";
 import { PortfolioModel } from "../types/PortfolioResponse";
+import { registPortfolioToArticle } from "@services/articleURL";
 
 export default class StockService {
   stockModel: ModelCtor<any>;
@@ -61,6 +62,7 @@ export default class StockService {
     await this.portfolioModel.Portfolio.findOrCreate({
       where: { stock_id: keyword, kakao_id: userId },
     });
+    await registPortfolioToArticle(keyword);
     return stockItem;
   }
 

@@ -38,3 +38,23 @@ export const registAllPortfolioToArticle = async (userid: number) => {
     logger.error(err);
   }
 };
+
+/**
+ * 포트폴리오에 각 주식을 등록할때마다 뉴스 기사를 article 테이블에 저장
+ * @param keyword
+ */
+export const registPortfolioToArticle = async (keyword: string) => {
+  const logger: Logger = Container.get("logger");
+  try {
+    const ArticleInstance = new ArticleService();
+    // naver search api 호출
+    const aixosResponse: AxiosResponse = await axios.get(
+      `https://openapi.naver.com/v1/search/news.json?query=${keyword}&display=20`,
+      { headers }
+    );
+    const articleArray: NaverNewsResponse[] = aixosResponse.data.items;
+    await ArticleInstance.addArticleInfo(articleArray, 0, keyword);
+  } catch (err) {
+    logger.error(err);
+  }
+};

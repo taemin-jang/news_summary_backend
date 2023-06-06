@@ -13,7 +13,9 @@ export default class StockService {
   portfolioModel;
   currentDate: Moment;
   stockLatestDay: string;
+  logger: Logger;
   constructor() {
+    this.logger = Container.get("logger");
     const db: Sequelize = Container.get("db");
     this.stockModel = db.models.Stock;
     this.portfolioModel = db.models;
@@ -57,7 +59,7 @@ export default class StockService {
     userId: number
   ): Promise<AxiosResponse> {
     const stockItem: AxiosResponse = await axios.get(
-      `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&basDt=20230525&itmsNm=${keyword}&numOfRows=10&resultType=json`
+      `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&itmsNm=${keyword}&numOfRows=1&resultType=json`
     );
     await this.portfolioModel.Portfolio.findOrCreate({
       where: { stock_id: keyword, kakao_id: userId },
@@ -119,21 +121,39 @@ export default class StockService {
   }
 
   /**
-   * 포트폴리오 데이터 테이블에 등록된 주식에 대한 정보를 반환하는 함수
+   * 포트폴리오 테이블에 등록된 주식에 대한 최신 정보를 반환하는 함수
    * @param portfolio
    * @returns
    */
   public async getRegistedStockInfo(
-    portfolio: PortfolioModel[]
+    portfolios: PortfolioModel[]
   ): Promise<PortfolioModel[]> {
-    let stockInfo: PortfolioModel[] = [];
-    for (let v of portfolio) {
-      const responose = await axios.get(
-        `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&basDt=20230525&itmsNm=${v.stock_id}&numOfRows=10&resultType=json`
-      );
-      stockInfo[v.id - 1] = responose.data.response.body.items.item[0];
+    // axios.get 요청할 작업들을 저장하는 배열
+    const tasks = portfolios.map((portfolio) => {
+      return axios
+        .get(
+          `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&itmsNm=${portfolio.stock_id}&numOfRows=1&resultType=json`
+        )
+        .then((response) => {
+          return {
+            id: portfolio.id,
+            data: response.data.response.body.items.item[0],
+          };
+        });
+    });
+    try {
+      // 여기서 responses는 각 요청에 대한 결과를 포함한 배열
+      const responses = await Promise.all(tasks);
+      return responses.map((response) => {
+        return {
+          id: response.id,
+          ...response.data,
+        };
+      });
+    } catch (error) {
+      this.logger.error("Error: ", error);
+      return [];
     }
-    return stockInfo;
   }
 
   /**

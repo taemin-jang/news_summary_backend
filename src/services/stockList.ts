@@ -132,12 +132,13 @@ export default class StockService {
     const tasks = portfolios.map((portfolio) => {
       return axios
         .get(
-          `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&itmsNm=${portfolio.stock_id}&numOfRows=1&resultType=json`
+          `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&itmsNm=${portfolio.stock_id}&numOfRows=5&resultType=json`
         )
         .then((response) => {
           return {
             id: portfolio.id,
             data: response.data.response.body.items.item[0],
+            datas: response.data.response.body.items.item,
           };
         });
     });
@@ -147,6 +148,7 @@ export default class StockService {
       return responses.map((response) => {
         return {
           id: response.id,
+          datas: response.datas,
           ...response.data,
         };
       });

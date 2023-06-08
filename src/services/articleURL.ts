@@ -32,7 +32,7 @@ export const registAllPortfolioToArticle = async (userid: number) => {
         { headers }
       );
       const articleArray: NaverNewsResponse[] = aixosResponse.data.items;
-      await ArticleInstance.addArticleInfo(articleArray, 0, portfolio.stock_id);
+      await ArticleInstance.addArticleInfo(articleArray, portfolio.stock_id);
     }
   } catch (err) {
     logger.error(err);
@@ -53,7 +53,7 @@ export const registPortfolioToArticle = async (keyword: string) => {
       { headers }
     );
     const articleArray: NaverNewsResponse[] = aixosResponse.data.items;
-    await ArticleInstance.addArticleInfo(articleArray, 0, keyword);
+    await ArticleInstance.addArticleInfo(articleArray, keyword);
   } catch (err) {
     logger.error(err);
   }

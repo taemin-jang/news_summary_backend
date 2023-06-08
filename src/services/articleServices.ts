@@ -47,65 +47,62 @@ export default class ArticleService {
   }
 
   /**
+   * 개별 기사에 대한 정보를 처리하는 함수
+   * @param article 기사 정보
+   * @param keyword 주식명
+   */
+  public async processArticle(article, keyword) {
+    const articleURL = article.link;
+    const response = await fetch(articleURL);
+    const htmlText = await response.text();
+    const image = getImage(htmlText);
+
+    if (image !== null) {
+      article.images = image;
+      const content = getContent(htmlText);
+      article.content = content;
+
+      if (content !== null) {
+        const contentSummary = await getContentSummary(content, article.title);
+        if (contentSummary.summary) {
+          article.summary = contentSummary.summary;
+          const keywordRes = await getGptKeyword(contentSummary.summary);
+          const keywords = keywordRes
+            ?.split("\n")
+            .map((keyword) => keyword.split(". ")[1]);
+          article.keywords = keywords;
+          await this.registArticle(article, keyword);
+        } else {
+          article.summary = contentSummary.error;
+        }
+      }
+    } else {
+      article.images = null;
+    }
+  }
+
+  /**
    * 뉴스 기사에 항목(이미지, 요약, 키워드 등)을 추가하는 함수
    * @param articleArray 뉴스 기사 리스트
-   * @param id 인덱스
    * @param keyword 주식 명
    */
   public async addArticleInfo(
     articleArray: NaverNewsResponse[],
-    id: number,
     keyword: string
   ) {
-    // news.naver가 포함된 주소만 찾는 정규식
     const regex = /news\.naver/;
-    // 기사 URL
-    let articleURL: string = "";
 
-    if (id < articleArray.length) {
-      // news.naver일 경우
-      if (regex.test(articleArray[id].link)) {
-        articleURL = articleArray[id].link;
-        // 해당 기사 정보 요청
-        const response = await fetch(articleURL);
-        // 기사의 htmlText 요청
-        const htmlText = await response.text();
-        // htmlText에 있는 이미지
-        const image = getImage(htmlText);
-        if (image !== null) {
-          // 이미지를 뉴스 기사에 추가
-          articleArray[id].images = image;
-          const content = getContent(htmlText);
-          // 기사 내용 추가
-          articleArray[id].content = content;
-
-          if (content !== null) {
-            let contentSummary: ClovaSummary = await getContentSummary(
-              content,
-              articleArray[id].title
-            ).then((result) => result);
-            if (contentSummary.summary) {
-              // 기사 요약본 추가
-              articleArray[id].summary = contentSummary.summary;
-              // 기사 핵심 키워드 추가
-              const keywordRes = await getGptKeyword(contentSummary.summary);
-              const keywords = keywordRes
-                ?.split("\n")
-                .map((keyword) => keyword.split(". ")[1]);
-              articleArray[id].keywords = keywords;
-
-              // 기사에 추가한 내용 db 등록
-              await this.registArticle(articleArray[id], keyword);
-            } else articleArray[id].summary = contentSummary.error;
-          }
-        }
+    const processPromises = articleArray.map(async (article) => {
+      if (regex.test(article.link)) {
+        await this.processArticle(article, keyword);
       } else {
-        // 네이버 뉴스 기사가 아닌경우 images에 null 추가
-        articleArray[id].images = null;
+        article.images = null;
       }
-      await this.addArticleInfo(articleArray, id + 1, keyword);
-    }
+    });
+
+    await Promise.all(processPromises);
   }
+
   /**
    * 각 사용자가 등록한 포트폴리오의 뉴스 기사 반환하는 함수
    * @param user_id number

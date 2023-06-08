@@ -58,13 +58,20 @@ export default class StockService {
     keyword: string,
     userId: number
   ): Promise<AxiosResponse> {
-    const stockItem: AxiosResponse = await axios.get(
+    const stockItemPromise = axios.get(
       `${config.stock_base_url}/getStockPriceInfo?serviceKey=${config.stock_service_key}&itmsNm=${keyword}&numOfRows=1&resultType=json`
     );
-    await this.portfolioModel.Portfolio.findOrCreate({
+    const portfolioPromise = this.portfolioModel.Portfolio.findOrCreate({
       where: { stock_id: keyword, kakao_id: userId },
     });
-    await registPortfolioToArticle(keyword);
+    const registPortfolioPromise = registPortfolioToArticle(keyword);
+
+    const [stockItem] = await Promise.all([
+      stockItemPromise,
+      portfolioPromise,
+      registPortfolioPromise,
+    ]);
+    console.log(stockItem);
     return stockItem;
   }
 
